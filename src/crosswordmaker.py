@@ -3,33 +3,6 @@ from enum import Enum
 import six
 from json import dumps
 
-from functools import wraps
-import errno
-import os
-import signal
-
-class TimeoutError(Exception):
-    pass
-
-def timeout(seconds=10, error_message=os.strerror(errno.ETIME)):
-    def decorator(func):
-        def _handle_timeout(signum, frame):
-            raise TimeoutError(error_message)
-
-        def wrapper(*args, **kwargs):
-            signal.signal(signal.SIGALRM, _handle_timeout)
-            signal.alarm(seconds)
-            try:
-                result = func(*args, **kwargs)
-            finally:
-                signal.alarm(0)
-            return result
-
-        return wraps(func)(wrapper)
-
-    return decorator
-
-
 class Direction(Enum):
     Horizontal = (0,1)
     Vertical = (1,0)
@@ -261,14 +234,18 @@ class CrossWordMaker:
             nextRow += dRow
             nextColumn += dColumn
 
-    def run(self):
+    async def run(self):
+        import asyncio
+        loop = asyncio.get_running_loop()
         try:
-            self._run()
+            future = loop.run_in_executor(None, self._run)
+            await asyncio.wait_for(future, 15, loop=loop)
             return True
-        except TimeoutError:
+        except asyncio.TimeoutError:
             return False
 
-    @timeout(10)
+        self._run()
+
     def _run(self):
         
         """Runs the creation of the puzzle."""
