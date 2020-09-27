@@ -279,9 +279,9 @@ function Game() {
           <Grid clues={clues} onCellSelected={(row:number,column:number)=>{setSelectedCell({row:row,column:column})}} template={template} board={board} setValue={updateCell} toggleTemplate={toggleTemplate} editingMode={editingMode}/>
         </div>
         <div style ={{textAlign: 'center', justifyContent: 'space-around', marginTop: 48,display: 'block', width: '100%', height: 48, bottom: 0, left: 0}}>
-          <div style={{marginBottom: 8}}><button onClick={e=>{validate() }}>Validate</button></div>
+          <div style={{marginBottom: 8}}><button disabled={isLoading || editingMode || !clues || clues.length === 0} onClick={e=>{validate() }}>Validate</button></div>
           <div style={{marginBottom: 8}}><button disabled={selectedCell ? false : true} onClick={e=>{reveal() }}>Reveal Cell</button></div>
-          <div style={{marginBottom: 8}}><button onClick={e=>{toggleEditingMode()}}>{editingMode ? 'Turn Off Editing Mode' : 'Turn On Editing Mode'}</button></div>
+          <div style={{marginBottom: 8}}><button disabled={isLoading} onClick={e=>{toggleEditingMode()}}>{editingMode ? 'Turn Off Editing Mode' : 'Turn On Editing Mode'}</button></div>
         </div>
       </div>
       <div style={{width: '50%', margin: 0, padding: 0, paddingTop: 64}}>
